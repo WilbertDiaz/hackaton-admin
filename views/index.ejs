@@ -3,20 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoftKob - Motel Manager</title>
+    <title>SoftKob - Sistema de Motel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --sk-blue: #1C4E80; --sk-yellow: #F4C21E; --bg-light: #eef2f5; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-light); padding-bottom: 50px;}
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-light); padding-bottom: 80px; }
+        
         .navbar-sk { background: var(--sk-blue); color: white; padding: 15px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .card-custom { border: none; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); background: white; margin-bottom: 20px; }
-        .btn-sk { background-color: var(--sk-blue); color: white; border: none; }
-        .btn-sk:hover { background-color: #153a61; color: var(--sk-yellow); }
-        .badge-price { background-color: var(--sk-yellow); color: #000; font-weight: bold; }
         
-        /* Animación para nuevas filas */
-        .fila-ocupacion { animation: fadeIn 0.3s ease-in-out; }
+        /* Estilos para textos de ayuda (Accessibility) */
+        .texto-ayuda {
+            background-color: #e3f2fd;
+            border-left: 5px solid #2196f3;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            color: #0d47a1;
+        }
+        .etiqueta-grande { font-weight: bold; font-size: 1.1rem; color: #333; }
+        
+        .fila-ocupacion { animation: fadeIn 0.3s ease-in-out; border-left: 5px solid var(--sk-yellow); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -24,14 +33,14 @@
 
 <nav class="navbar-sk sticky-top">
     <div class="container d-flex justify-content-between align-items-center">
-        <h3 class="m-0 fw-bold">SoftKob <span style="color:var(--sk-yellow); font-size:0.5em;">MOTEL PRO</span></h3>
+        <h3 class="m-0 fw-bold">SoftKob <span style="color:var(--sk-yellow); font-size:0.5em;">CONTROL DE MOTEL</span></h3>
         <% if (modo === 'dashboard') { %>
             <div class="d-flex gap-2">
                 <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#modalNuevaHab">
-                    + Habitación
+                    + Nueva Habitación
                 </button>
-                <form action="/reset-total" method="POST" onsubmit="return confirm('¿Borrar TODO?');" style="display:inline;">
-                    <button class="btn btn-sm btn-outline-warning">Reiniciar</button>
+                <form action="/reset-total" method="POST" onsubmit="return confirm('ATENCIÓN: ¿Está seguro que quiere BORRAR TODO el sistema y empezar de cero?');" style="display:inline;">
+                    <button class="btn btn-sm btn-outline-warning">Reiniciar Sistema</button>
                 </form>
             </div>
         <% } %>
@@ -42,45 +51,68 @@
 
     <% if (modo === 'setup') { %>
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-9">
                 <div class="card card-custom p-5">
-                    <h2 class="text-center text-primary mb-3">Configuración Inicial</h2>
+                    <h2 class="text-center text-primary mb-3">🛠️ Paso 1: Alta de Habitaciones</h2>
+                    
+                    <div class="texto-ayuda">
+                        <strong>¿Qué debo hacer aquí?</strong><br>
+                        Bienvenido. Antes de empezar a cobrar, necesitamos registrar <strong>todas las habitaciones</strong> que tiene su motel.<br>
+                        Por ejemplo: Si tiene 10 cuartos, debe agregarlos aquí uno por uno con su precio.
+                    </div>
+
                     <form action="/guardar-config" method="POST">
                         <div class="mb-4">
-                            <label class="fw-bold">Nombre del Motel</label>
-                            <input type="text" name="nombreNegocio" class="form-control form-control-lg" placeholder="Ej: Motel Los Sauces" required>
+                            <label class="etiqueta-grande">Nombre de su Negocio</label>
+                            <input type="text" name="nombreNegocio" class="form-control form-control-lg" placeholder="Escriba aquí (Ej: Motel El Descanso)" required>
                         </div>
                         
-                        <label class="fw-bold mb-2">Registra al menos una habitación:</label>
+                        <hr>
+                        <h4 class="mb-3">Lista de Habitaciones</h4>
+                        <div class="texto-ayuda bg-light text-dark border-secondary">
+                            Llene los datos del primer cuarto abajo. Si necesita agregar otro, presione el botón gris <strong>"+ Agregar otro renglón"</strong>.
+                        </div>
+
                         <div id="container-setup-habs">
                             </div>
                         
-                        <button type="button" class="btn btn-secondary btn-sm mb-4" onclick="agregarFilaSetup()">+ Agregar otra al inicio</button>
+                        <button type="button" class="btn btn-secondary mb-4 w-100 py-2" onclick="agregarFilaSetup()">
+                            ➕ Agregar otro renglón para otra habitación
+                        </button>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-sk btn-lg">Guardar y Comenzar</button>
+                            <button type="submit" class="btn btn-primary btn-lg py-3">✅ GUARDAR Y EMPEZAR A TRABAJAR</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+
         <script>
-            // Script simple para setup inicial
+            // Script para agregar filas en el setup
             function agregarFilaSetup() {
                 const div = document.createElement('div');
-                div.className = 'row g-2 mb-2';
+                div.className = 'row g-2 mb-3 border-bottom pb-2';
                 div.innerHTML = `
-                    <div class="col-5"><input type="text" name="room_name" class="form-control" placeholder="Nombre/Número" required></div>
-                    <div class="col-4">
+                    <div class="col-md-5">
+                        <label class="small text-muted">Nombre o Número</label>
+                        <input type="text" name="room_name" class="form-control" placeholder="Ej: Habitación 1" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small text-muted">Tipo de Cuarto</label>
                         <select name="room_type" class="form-select">
-                            <option value="Sencilla">Sencilla</option><option value="Jacuzzi">Jacuzzi</option><option value="Suite">Suite</option>
+                            <option value="Sencilla">Sencilla</option>
+                            <option value="Jacuzzi">Con Jacuzzi</option>
+                            <option value="Suite">Suite / Master</option>
                         </select>
                     </div>
-                    <div class="col-3"><input type="number" name="room_price" class="form-control" placeholder="$ Precio" required></div>
+                    <div class="col-md-3">
+                        <label class="small text-muted">Precio ($)</label>
+                        <input type="number" name="room_price" class="form-control" placeholder="0.00" required>
+                    </div>
                 `;
                 document.getElementById('container-setup-habs').appendChild(div);
             }
-            // Inicializar con 1 fila
             window.onload = agregarFilaSetup; 
         </script>
     <% } %>
@@ -94,118 +126,156 @@
 
         <div class="row g-4">
             
-            <div class="col-lg-5">
-                <div class="card card-custom p-4">
-                    <h4 class="mb-3 border-bottom pb-2">📝 Nuevo Cierre de Turno</h4>
+            <div class="col-lg-6">
+                <div class="card card-custom p-4 border border-primary">
+                    <h3 class="mb-3 text-primary border-bottom pb-2">📝 Nuevo Corte de Turno</h3>
+                    
+                    <div class="texto-ayuda">
+                        <strong>Instrucciones:</strong> Llene esta hoja al finalizar el turno del trabajador para registrar cuánto dinero entró.
+                    </div>
+
                     <form action="/agregar-turno" method="POST">
                         <div class="row mb-3">
                             <div class="col-6">
-                                <label class="small fw-bold">Fecha</label>
-                                <input type="date" name="fecha" class="form-control" required>
+                                <label class="etiqueta-grande">Fecha del Corte</label>
+                                <input type="date" name="fecha" class="form-control form-control-lg" required>
                             </div>
                             <div class="col-6">
-                                <label class="small fw-bold">Encargado</label>
-                                <input type="text" name="trabajador" class="form-control" placeholder="Nombre" required>
+                                <label class="etiqueta-grande">Recepcionista</label>
+                                <input type="text" name="trabajador" class="form-control form-control-lg" placeholder="Nombre" required>
                             </div>
                         </div>
 
-                        <div class="bg-light p-3 rounded mb-3 border">
-                            <label class="fw-bold mb-2">¿Cuántas ocupaciones hubo?</label>
+                        <div class="p-3 rounded mb-3" style="background-color: #fff3cd; border: 1px solid #ffeeba;">
+                            <label class="etiqueta-grande mb-2">1. Conteo de Rentas</label>
+                            <p class="small mb-2">¿Cuántas veces se ocuparon habitaciones en este turno? (Cuente todas las ocupaciones del día).</p>
+                            
                             <div class="input-group">
-                                <input type="number" id="num_ocupaciones" class="form-control" value="1" min="1">
-                                <button type="button" class="btn btn-outline-primary" onclick="generarFormulario()">Generar Filas</button>
+                                <input type="number" id="num_ocupaciones" class="form-control form-control-lg text-center fw-bold" value="1" min="1">
+                                <button type="button" class="btn btn-primary" onclick="generarFormulario()">
+                                    👇 Crear renglones para llenar
+                                </button>
                             </div>
-                            <small class="text-muted">Presiona el botón para listar los espacios.</small>
                         </div>
 
-                        <div id="lista-ocupaciones" class="mb-3">
+                        <div id="zona-llenado" style="display:none;">
+                            <div class="texto-ayuda">
+                                <strong>2. Desglose:</strong> Ahora, seleccione qué habitación se usó en cada renglón. Si vendieron algo extra (refrescos, condones), anote el monto en "Extra".
                             </div>
+                            
+                            <div id="lista-ocupaciones" class="mb-3">
+                                </div>
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-sk py-2" id="btn-guardar" style="display:none;">💾 Guardar Turno Completo</button>
+                            <div class="d-grid pt-2">
+                                <button type="submit" class="btn btn-success btn-lg py-3 fw-bold shadow">
+                                    💾 GUARDAR CORTE (TERMINAR)
+                                </button>
+                            </div>
                         </div>
+
                     </form>
                 </div>
 
-                <div class="card card-custom p-4">
-                    <h5 class="text-secondary">📊 Consultar Reporte</h5>
+                <div class="card card-custom p-4 mt-4">
+                    <h4 class="text-secondary">📅 Consultar Sumas Totales</h4>
+                    <p class="text-muted small">Seleccione una fecha de inicio y una fecha de fin para sumar todo el dinero de ese periodo.</p>
                     <form action="/generar-informe" method="POST">
-                        <div class="row g-2">
-                            <div class="col-5"><input type="date" name="fechaInicio" class="form-control form-control-sm" required></div>
-                            <div class="col-5"><input type="date" name="fechaFin" class="form-control form-control-sm" required></div>
-                            <div class="col-2"><button class="btn btn-sm btn-dark w-100">IR</button></div>
+                        <div class="row g-2 align-items-end">
+                            <div class="col-5">
+                                <label class="small fw-bold">Desde:</label>
+                                <input type="date" name="fechaInicio" class="form-control" required>
+                            </div>
+                            <div class="col-5">
+                                <label class="small fw-bold">Hasta:</label>
+                                <input type="date" name="fechaFin" class="form-control" required>
+                            </div>
+                            <div class="col-2">
+                                <button class="btn btn-dark w-100">BUSCAR</button>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <div class="col-lg-7">
+            <div class="col-lg-6">
                 
                 <% if (reporte) { %>
-                    <div class="alert alert-warning border-warning shadow-sm">
-                        <div class="row text-center align-items-center">
-                            <div class="col">
-                                <small class="text-muted text-uppercase">Turnos</small>
-                                <div class="h4 mb-0"><%= reporte.turnos %></div>
+                    <div class="card bg-warning bg-opacity-10 border border-warning p-3 mb-4">
+                        <h4 class="text-center text-dark fw-bold mb-3">Resultado de la Suma</h4>
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <small class="text-uppercase text-muted">Total Días</small>
+                                <div class="h3"><%= reporte.turnos %></div>
                             </div>
-                            <div class="col border-start border-end border-warning">
-                                <small class="text-muted text-uppercase">Ocupaciones</small>
-                                <div class="h4 mb-0"><%= reporte.ocupaciones %></div>
+                            <div class="col-4 border-start border-end border-warning">
+                                <small class="text-uppercase text-muted">Ocupaciones</small>
+                                <div class="h3"><%= reporte.ocupaciones %></div>
                             </div>
-                            <div class="col">
-                                <small class="text-muted text-uppercase">Total Dinero</small>
-                                <div class="h4 mb-0 text-success fw-bold">$<%= reporte.totalCaja %></div>
+                            <div class="col-4">
+                                <small class="text-uppercase text-muted">Dinero Total</small>
+                                <div class="h3 text-success fw-bold">$<%= reporte.totalCaja %></div>
                             </div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small>Del <%= reporte.inicio %> al <%= reporte.fin %></small>
                         </div>
                     </div>
                 <% } %>
 
-                <h5 class="mb-3 text-secondary">Historial Registrado</h5>
-                <% if (turnos.length === 0) { %>
-                    <div class="text-center p-5 text-muted bg-white rounded">No hay registros aún.</div>
-                <% } %>
+                <div class="card card-custom p-4">
+                    <h4 class="mb-3 text-secondary">🗂️ Historial de Cortes (Turnos Anteriores)</h4>
+                    <% if (turnos.length === 0) { %>
+                        <div class="alert alert-light text-center border">
+                            Todavía no se ha guardado ningún corte de turno.
+                        </div>
+                    <% } %>
 
-                <div class="accordion" id="accordionHistory">
-                    <% turnos.forEach(function(t, index) { %>
-                        <div class="accordion-item border-0 mb-3 shadow-sm rounded overflow-hidden">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<%= index %>">
-                                    <div class="d-flex w-100 justify-content-between align-items-center me-3">
-                                        <div>
-                                            <div class="fw-bold text-dark"><%= t.fecha %></div>
-                                            <small class="text-muted"><%= t.trabajador %></small>
+                    <div class="accordion" id="accordionHistory">
+                        <% turnos.forEach(function(t, index) { %>
+                            <div class="accordion-item border-0 mb-3 shadow-sm rounded overflow-hidden">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<%= index %>">
+                                        <div class="d-flex w-100 justify-content-between align-items-center me-3">
+                                            <div>
+                                                <div class="fw-bold text-dark fs-5"><%= t.fecha %></div>
+                                                <small class="text-muted">Encargado: <%= t.trabajador %></small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-secondary mb-1"><%= t.cantidadOcupaciones %> rentas</span>
+                                                <span class="d-block text-success fw-bold fs-5">$<%= t.totalGeneral %></span>
+                                            </div>
                                         </div>
-                                        <div class="text-end">
-                                            <span class="badge bg-secondary"><%= t.cantidadOcupaciones %> rentas</span>
-                                            <span class="d-block text-success fw-bold">$<%= t.totalGeneral %></span>
-                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="collapse<%= index %>" class="accordion-collapse collapse" data-bs-parent="#accordionHistory">
+                                    <div class="accordion-body bg-light p-2">
+                                        <table class="table table-sm table-white mb-0">
+                                            <thead class="text-muted small">
+                                                <tr><th>Habitación</th><th>Extras</th><th class="text-end">Total</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                <% t.ocupaciones.forEach(function(o) { %>
+                                                    <tr>
+                                                        <td>
+                                                            <span class="fw-bold"><%= o.cuarto %></span><br>
+                                                            <small class="text-muted"><%= o.tipo %></small>
+                                                        </td>
+                                                        <td>
+                                                            <% if(o.extra > 0) { %>
+                                                                <span class="text-danger fw-bold">+ $<%= o.extra %></span><br>
+                                                                <small class="fst-italic"><%= o.notaExtra %></small>
+                                                            <% } else { %> - <% } %>
+                                                        </td>
+                                                        <td class="text-end align-middle fw-bold">$<%= o.subtotal %></td>
+                                                    </tr>
+                                                <% }); %>
+                                            </tbody>
+                                        </table>
                                     </div>
-                                </button>
-                            </h2>
-                            <div id="collapse<%= index %>" class="accordion-collapse collapse" data-bs-parent="#accordionHistory">
-                                <div class="accordion-body bg-light p-2">
-                                    <table class="table table-sm table-borderless mb-0">
-                                        <thead class="text-muted small border-bottom">
-                                            <tr><th>Habitación</th><th>Extra</th><th class="text-end">Total</th></tr>
-                                        </thead>
-                                        <tbody>
-                                            <% t.ocupaciones.forEach(function(o) { %>
-                                                <tr>
-                                                    <td><%= o.cuarto %> <small class="text-muted">(<%= o.tipo %>)</small></td>
-                                                    <td>
-                                                        <% if(o.extra > 0) { %>
-                                                            <span class="text-danger small">+<%= o.extra %> (<%= o.notaExtra %>)</span>
-                                                        <% } else { %> - <% } %>
-                                                    </td>
-                                                    <td class="text-end fw-bold">$<%= o.subtotal %></td>
-                                                </tr>
-                                            <% }); %>
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
-                        </div>
-                    <% }); %>
+                        <% }); %>
+                    </div>
                 </div>
             </div>
         </div>
@@ -214,19 +284,20 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Agregar al Inventario</h5>
+                        <h5 class="modal-title">Agregar Nueva Habitación</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <form action="/agregar-habitacion-extra" method="POST">
                         <div class="modal-body">
-                            <div class="mb-2"><label>Nombre/Número</label><input type="text" name="nuevo_nombre" class="form-control" required></div>
+                            <p class="small">Llene los datos para agregar un cuarto extra al sistema.</p>
+                            <div class="mb-2"><label>Nombre/Número</label><input type="text" name="nuevo_nombre" class="form-control" placeholder="Ej: Habitación 20" required></div>
                             <div class="mb-2">
                                 <label>Tipo</label>
                                 <select name="nuevo_tipo" class="form-select">
                                     <option value="Sencilla">Sencilla</option><option value="Jacuzzi">Jacuzzi</option><option value="Suite">Suite</option>
                                 </select>
                             </div>
-                            <div class="mb-2"><label>Precio</label><input type="number" name="nuevo_precio" class="form-control" required></div>
+                            <div class="mb-2"><label>Precio de Renta ($)</label><input type="number" name="nuevo_precio" class="form-control" required></div>
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn-primary w-100">Guardar Habitación</button>
@@ -237,44 +308,49 @@
         </div>
 
         <script>
-            // Convertimos la lista de habitaciones del backend a un objeto JS para usarlo al crear filas
+            // CONFIGURACIÓN DE HABITACIONES (NO TOCAR)
             const habitacionesConfig = <%- JSON.stringify(config.habitaciones) %>;
 
             function generarFormulario() {
                 const cantidad = document.getElementById('num_ocupaciones').value;
                 const contenedor = document.getElementById('lista-ocupaciones');
-                const btnGuardar = document.getElementById('btn-guardar');
+                const zonaLlenado = document.getElementById('zona-llenado');
                 
                 contenedor.innerHTML = ''; // Limpiar previo
+                zonaLlenado.style.display = 'block'; // Mostrar formulario
 
-                // Generar las opciones del Select una sola vez
-                let opcionesHtml = '<option value="" disabled selected>Selecciona Habitación...</option>';
+                // Crear lista de opciones
+                let opcionesHtml = '<option value="" disabled selected>-- Seleccione Habitación --</option>';
                 habitacionesConfig.forEach(h => {
                     opcionesHtml += `<option value="${h.id}">${h.nombre} (${h.tipo}) - $${h.precio}</option>`;
                 });
 
                 for (let i = 0; i < cantidad; i++) {
                     const row = document.createElement('div');
-                    row.className = 'fila-ocupacion card p-3 mb-2 border';
+                    row.className = 'fila-ocupacion card p-3 mb-3 border shadow-sm';
                     row.innerHTML = `
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="badge bg-secondary">Ocupación #${i + 1}</span>
+                        <div class="d-flex justify-content-between mb-2 border-bottom pb-1">
+                            <span class="fw-bold text-primary">Renglón #${i + 1}</span>
                         </div>
-                        <div class="mb-2">
-                            <select name="habitacion_selec" class="form-select fw-bold" required>
-                                ${opcionesHtml}
-                            </select>
-                        </div>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">Extra $</span>
-                            <input type="number" name="extra_monto" class="form-control" placeholder="0">
-                            <input type="text" name="extra_desc" class="form-control w-50" placeholder="Motivo (bebidas, etc)">
+                        <div class="row g-2">
+                            <div class="col-12 mb-2">
+                                <label class="small text-muted">¿Qué cuarto se usó?</label>
+                                <select name="habitacion_selec" class="form-select fw-bold" style="background-color:#f0f8ff;" required>
+                                    ${opcionesHtml}
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <label class="small text-muted">Extra ($)</label>
+                                <input type="number" name="extra_monto" class="form-control" placeholder="0">
+                            </div>
+                            <div class="col-8">
+                                <label class="small text-muted">Motivo del Extra</label>
+                                <input type="text" name="extra_desc" class="form-control" placeholder="Ej: Coca-cola, Sabritas...">
+                            </div>
                         </div>
                     `;
                     contenedor.appendChild(row);
                 }
-
-                btnGuardar.style.display = 'block';
             }
         </script>
     <% } %>
