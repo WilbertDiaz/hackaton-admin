@@ -3,211 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoftKob - Gestión de Negocios</title>
+    <title>SoftKob - Gestión Hotelera</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --sk-blue: #285C9B; /* Azul del logo */
-            --sk-yellow: #F4C21E; /* Amarillo del logo */
-            --sk-text: #ffffff;
+            --sk-blue: #1C4E80;
+            --sk-yellow: #F4C21E;
+            --bg-light: #F0F2F5;
         }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f7f6;
-        }
-        .navbar-custom {
-            background-color: var(--sk-blue);
-            padding: 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .brand-text {
-            color: white;
-            font-weight: 700;
-            font-size: 1.8rem;
-            letter-spacing: 1px;
-        }
-        .brand-sub {
-            color: var(--sk-yellow);
-            font-size: 0.9rem;
-            font-weight: 400;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-light); }
+        
+        .navbar-sk { background-color: var(--sk-blue); padding: 1rem; color: white; }
+        .text-sk-blue { color: var(--sk-blue); }
+        .bg-sk-blue { background-color: var(--sk-blue); color: white; }
+        .text-sk-yellow { color: var(--sk-yellow); }
+        
         .card-custom {
             border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
             background: white;
-            transition: transform 0.2s;
+            overflow: hidden;
         }
-        .btn-softkob {
+        
+        .btn-primary-sk {
             background-color: var(--sk-blue);
             color: white;
             border: none;
+            transition: 0.3s;
         }
-        .btn-softkob:hover {
-            background-color: #1e4575;
-            color: var(--sk-yellow);
-        }
-        .header-section {
-            background: linear-gradient(135deg, var(--sk-blue) 0%, #1a3a63 100%);
-            color: white;
-            padding: 3rem 0;
-            margin-bottom: 2rem;
-            border-bottom: 5px solid var(--sk-yellow);
-        }
-        .metric-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--sk-blue);
-        }
-        .report-box {
-            background-color: #fff8e1; /* Fondo amarillento suave */
-            border-left: 5px solid var(--sk-yellow);
+        .btn-primary-sk:hover { background-color: #163d66; color: var(--sk-yellow); }
+        
+        /* Estilos para el Switch/Checkbox */
+        .form-check-input:checked {
+            background-color: var(--sk-blue);
+            border-color: var(--sk-blue);
         }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-custom">
-    <div class="container d-flex justify-content-between align-items-center">
-        <div>
-            <div class="brand-text">SoftKob</div>
-            <div class="brand-sub">Software a medida para tu negocio</div>
-        </div>
-        <form action="/limpiar" method="POST" onsubmit="return confirm('¿Seguro que quieres borrar todo?');">
-            <button class="btn btn-outline-light btn-sm">Reiniciar Sistema</button>
-        </form>
+<nav class="navbar-sk d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="m-0 fw-bold">SoftKob <span class="text-sk-yellow" style="font-size:0.6em;">MOTEL EDITION</span></h3>
     </div>
+    <% if (modo === 'dashboard') { %>
+        <form action="/reset-total" method="POST" onsubmit="return confirm('¿Reiniciar TODA la configuración y datos?');">
+            <button class="btn btn-outline-warning btn-sm">⚙️ Re-Configurar</button>
+        </form>
+    <% } %>
 </nav>
 
-<div class="header-section text-center">
-    <div class="container">
-        <h2>Panel de Control Diario</h2>
-        <p class="opacity-75">Gestiona tus turnos, ingresos y reportes en tiempo real.</p>
-    </div>
-</div>
-
 <div class="container pb-5">
-    <div class="row g-4">
-        
-        <div class="col-md-4">
-            <div class="card card-custom p-4">
-                <h4 class="mb-3 text-primary"><i class="bi bi-plus-circle"></i> Nuevo Turno</h4>
-                <form action="/agregar-turno" method="POST">
-                    <div class="mb-3">
-                        <label class="form-label text-muted">Fecha del Turno</label>
-                        <input type="date" name="fecha" class="form-control" required>
-                    </div>
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label text-muted">Ventas ($)</label>
-                            <input type="number" step="0.01" name="ventas" class="form-control" placeholder="0.00" required>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label text-muted">Gastos ($)</label>
-                            <input type="number" step="0.01" name="gastos" class="form-control" placeholder="0.00">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-muted">Notas / Observaciones</label>
-                        <textarea name="notas" class="form-control" rows="2" placeholder="Incidencias del día..."></textarea>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-softkob py-2">💾 Guardar Turno</button>
-                    </div>
-                </form>
-            </div>
 
-            <div class="card card-custom p-4 mt-4">
-                <h5 class="mb-3 text-secondary">Generar Informe Acumulado</h5>
-                <form action="/generar-informe" method="POST">
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">De</span>
-                        <input type="date" name="fechaInicio" class="form-control" required>
-                    </div>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">A</span>
-                        <input type="date" name="fechaFin" class="form-control" required>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-outline-primary">📊 Calcular Totales</button>
-                    </div>
-                </form>
+    <% if (modo === 'setup') { %>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card card-custom p-5">
+                    <h2 class="text-center mb-4 text-sk-blue">Configuración Inicial del Establecimiento</h2>
+                    <p class="text-center text-muted mb-4">Antes de empezar, define las habitaciones de tu motel.</p>
+                    
+                    <form action="/guardar-config" method="POST">
+                        <div class="mb-4">
+                            <label class="fw-bold">Nombre del Motel</label>
+                            <input type="text" name="nombreNegocio" class="form-control form-control-lg" placeholder="Ej: Motel Paraíso" required>
+                        </div>
+
+                        <h5 class="mb-3 border-bottom pb-2">Registro de Habitaciones</h5>
+                        <div id="lista-habitaciones">
+                            <% for(let i=1; i<=5; i++) { %>
+                                <div class="row g-2 mb-2">
+                                    <div class="col-4">
+                                        <input type="text" name="room_names" class="form-control" placeholder="Nombre/Núm (Ej: 10<%= i %>)" required>
+                                    </div>
+                                    <div class="col-4">
+                                        <select name="room_types" class="form-select">
+                                            <option value="Sencilla">Sencilla</option>
+                                            <option value="Jacuzzi">Con Jacuzzi</option>
+                                            <option value="Suite">Suite Master</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" name="room_prices" class="form-control" placeholder="Precio" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="text-center mt-2 mb-4">
+                            <small class="text-muted">Por defecto mostramos 5 espacios, puedes editar esto en el código si necesitas más.</small>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary-sk btn-lg">🚀 Guardar y Empezar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+
+    <% if (modo === 'dashboard') { %>
+        
+        <div class="row">
+            <div class="col-12 text-center mb-4">
+                <h1 class="fw-bold text-sk-blue"><%= config.nombre %></h1>
+                <p class="text-muted">Sistema de Control de Turnos y Habitaciones</p>
             </div>
         </div>
 
-        <div class="col-md-8">
-            
-            <% if (reporte) { %>
-                <div class="card card-custom p-4 mb-4 report-box">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="text-dark mb-0">Informe de Resultados</h4>
-                        <span class="badge bg-warning text-dark">Rango: <%= reporte.inicio %> a <%= reporte.fin %></span>
-                    </div>
-                    <hr>
-                    <div class="row text-center">
-                        <div class="col-md-4">
-                            <small class="text-muted">Total Ventas</small>
-                            <div class="fs-3 text-success fw-bold">$<%= reporte.totalVentas.toFixed(2) %></div>
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="card card-custom p-4 sticky-top" style="top: 20px; z-index: 1;">
+                    <h4 class="mb-3 text-sk-blue"><i class="bi bi-clock-history"></i> Cierre de Turno</h4>
+                    <form action="/agregar-turno" method="POST">
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="small fw-bold">Fecha</label>
+                                <input type="date" name="fecha" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="small fw-bold">Trabajador</label>
+                                <input type="text" name="trabajador" class="form-control" placeholder="Nombre" required>
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <small class="text-muted">Total Gastos</small>
-                            <div class="fs-3 text-danger fw-bold">$<%= reporte.totalGastos.toFixed(2) %></div>
-                        </div>
-                        <div class="col-md-4">
-                            <small class="text-muted">Ganancia Neta</small>
-                            <div class="fs-3 text-primary fw-bold">$<%= reporte.totalGanancia.toFixed(2) %></div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-3">
-                        <small>Datos procesados de <strong><%= reporte.diasContados %></strong> turnos registrados.</small>
-                        <br>
-                        <a href="/" class="btn btn-sm btn-link text-decoration-none">Cerrar reporte</a>
-                    </div>
-                </div>
-            <% } %>
 
-            <div class="card card-custom p-4">
-                <h4 class="mb-4">Historial de Turnos</h4>
-                <% if (turnos.length === 0) { %>
-                    <div class="text-center py-5 text-muted">
-                        <p>No hay datos registrados aún.</p>
-                        <p>Utiliza el panel izquierdo para ingresar el primer turno.</p>
-                    </div>
-                <% } else { %>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Ventas</th>
-                                    <th>Gastos</th>
-                                    <th>Ganancia</th>
-                                    <th>Notas</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% turnos.forEach(function(t) { %>
+                        <div class="alert alert-info py-2 small">
+                            Marca las habitaciones que se <strong>alquilaron</strong> hoy.
+                        </div>
+
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-sm align-middle">
+                                <thead class="table-light sticky-top">
                                     <tr>
-                                        <td class="fw-bold"><%= t.fecha %></td>
-                                        <td class="text-success">$<%= t.ventas.toFixed(2) %></td>
-                                        <td class="text-danger">$<%= t.gastos.toFixed(2) %></td>
-                                        <td>
-                                            <span class="badge <%= t.ganancia >= 0 ? 'bg-primary' : 'bg-danger' %>">
-                                                $<%= t.ganancia.toFixed(2) %>
-                                            </span>
-                                        </td>
-                                        <td class="small text-muted"><%= t.notas %></td>
+                                        <th>Habitación</th>
+                                        <th class="text-center">¿Se usó?</th>
+                                        <th>Extras ($)</th>
                                     </tr>
-                                <% }); %>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <% config.habitaciones.forEach(function(hab) { %>
+                                        <tr>
+                                            <td>
+                                                <strong><%= hab.nombre %></strong>
+                                                <br>
+                                                <small class="text-muted"><%= hab.tipo %> ($<%= hab.precio %>)</small>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="form-check form-switch d-flex justify-content-center">
+                                                    <input class="form-check-input" type="checkbox" name="uso_<%= hab.id %>">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="extra_<%= hab.id %>" class="form-control form-control-sm" placeholder="0" min="0">
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-grid mt-3">
+                            <button type="submit" class="btn btn-primary-sk py-2">💾 Registrar Cierre de Turno</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="card card-custom p-4 mt-4">
+                    <h5 class="text-secondary">Consultar Período</h5>
+                    <form action="/generar-informe" method="POST" class="d-flex gap-2">
+                        <input type="date" name="fechaInicio" class="form-control" required>
+                        <input type="date" name="fechaFin" class="form-control" required>
+                        <button class="btn btn-outline-dark">🔍</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                
+                <% if (reporte) { %>
+                    <div class="card card-custom bg-warning bg-opacity-10 border border-warning p-3 mb-3">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <small>Turnos</small>
+                                <div class="fw-bold fs-4"><%= reporte.dias %></div>
+                            </div>
+                            <div class="col-4">
+                                <small>Extras</small>
+                                <div class="fw-bold fs-4 text-danger">$<%= reporte.totalExtras %></div>
+                            </div>
+                            <div class="col-4">
+                                <small>Total Caja</small>
+                                <div class="fw-bold fs-4 text-success">$<%= reporte.totalCaja %></div>
+                            </div>
+                        </div>
                     </div>
                 <% } %>
+
+                <div class="card card-custom p-4">
+                    <h5 class="mb-3">Historial de Turnos</h5>
+                    <% if (turnos.length === 0) { %>
+                        <p class="text-muted text-center py-4">No hay turnos registrados aún.</p>
+                    <% } %>
+
+                    <div class="accordion" id="accordionTurnos">
+                        <% turnos.forEach(function(t, index) { %>
+                            <div class="accordion-item border-0 mb-2 shadow-sm">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<%= index %>">
+                                        <div class="d-flex w-100 justify-content-between me-3">
+                                            <span>📅 <strong><%= t.fecha %></strong> - <%= t.trabajador %></span>
+                                            <span class="text-success fw-bold">$<%= t.totalGeneral %></span>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="collapse<%= index %>" class="accordion-collapse collapse" data-bs-parent="#accordionTurnos">
+                                    <div class="accordion-body bg-light">
+                                        <table class="table table-sm table-bordered bg-white">
+                                            <thead>
+                                                <tr class="text-muted small">
+                                                    <th>Habitación</th>
+                                                    <th>Tarifa</th>
+                                                    <th>Extras</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% t.detalles.forEach(function(d) { %>
+                                                    <tr>
+                                                        <td><%= d.nombre %> <small>(<%= d.tipo %>)</small></td>
+                                                        <td>$<%= d.precioBase %></td>
+                                                        <td class="<%= d.extra > 0 ? 'text-danger fw-bold' : '' %>">
+                                                            $<%= d.extra %>
+                                                        </td>
+                                                        <td class="fw-bold">$<%= d.subtotal %></td>
+                                                    </tr>
+                                                <% }); %>
+                                            </tbody>
+                                        </table>
+                                        <div class="text-end small text-muted">
+                                            ID Turno: <%= t.id %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    <% } %>
+
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
